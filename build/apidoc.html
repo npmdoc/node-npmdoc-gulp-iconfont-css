@@ -1,0 +1,310 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/backflip/gulp-iconfont-css#readme"
+
+    >gulp-iconfont-css (v2.1.0)</a>
+</h1>
+<h4>Generate (S)CSS file for icon font created with Gulp</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-iconfont-css">module gulp-iconfont-css</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-iconfont-css.gulp-iconfont-css">
+            function <span class="apidocSignatureSpan"></span>gulp-iconfont-css
+            <span class="apidocSignatureSpan">(config)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-iconfont-css.toString">
+            function <span class="apidocSignatureSpan">gulp-iconfont-css.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-iconfont-css.toString">module gulp-iconfont-css.toString</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-iconfont-css.toString.toString">
+            function <span class="apidocSignatureSpan">gulp-iconfont-css.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-iconfont-css" id="apidoc.module.gulp-iconfont-css">module gulp-iconfont-css</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-iconfont-css.gulp-iconfont-css" id="apidoc.element.gulp-iconfont-css.gulp-iconfont-css">
+        function <span class="apidocSignatureSpan"></span>gulp-iconfont-css
+        <span class="apidocSignatureSpan">(config)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function iconfontCSS(config) {
+	var glyphMap = [],
+		currentGlyph,
+		currentCodePoint,
+		inputFilePrefix,
+		stream,
+		outputFile,
+		engine,
+		cssClass;
+
+	// Set default values
+	config = _.merge({
+		path: &#x27;css&#x27;,
+		targetPath: &#x27;_icons.css&#x27;,
+		fontPath: &#x27;./&#x27;,
+		engine: &#x27;lodash&#x27;,
+		firstGlyph: 0xE001,
+		fixedCodepoints: false,
+		cssClass: &#x27;icon&#x27;
+	}, config);
+
+	// Enable default stylesheet generators
+	if(!config.path) {
+		config.path = &#x27;scss&#x27;;
+	}
+	if(/^(scss|less|css)$/i.test(config.path)) {
+		config.path = __dirname + &#x27;/templates/_icons.&#x27; + config.path;
+	}
+
+	// Validate config
+	if (!config.fontName) {
+		throw new gutil.PluginError(PLUGIN_NAME, &#x27;Missing option &#x22;fontName&#x22;&#x27;);
+	}
+	if (!consolidate[config.engine]) {
+		throw new gutil.PluginError(PLUGIN_NAME, &#x27;Consolidate missing template engine &#x22;&#x27; + config.engine + &#x27;&#x22;&#x27;);
+	}
+	try {
+		engine = require(config.engine);
+	} catch(e) {
+		throw new gutil.PluginError(PLUGIN_NAME, &#x27;Template engine &#x22;&#x27; + config.engine + &#x27;&#x22; not present&#x27;);
+	}
+
+	// Define starting point
+	currentGlyph = config.firstGlyph;
+
+	// Happy streaming
+	stream = Stream.PassThrough({
+		objectMode: true
+	});
+
+	stream._transform = function(file, unused, cb) {
+		var fileName;
+
+		if (file.isNull()) {
+			this.push(file);
+			return cb();
+		}
+
+		// Create output file
+		if (!outputFile) {
+			outputFile = new gutil.File({
+				base: file.base,
+				cwd: file.cwd,
+				path: path.join(file.base, config.targetPath),
+				contents: file.isBuffer() ? new Buffer(0) : new Stream.PassThrough()
+			});
+		}
+
+		fileName = path.basename(file.path, &#x27;.svg&#x27;);
+		
+		if (config.fixedCodepoints &#x26;&#x26; config.fixedCodepoints[fileName]) {
+			currentCodePoint = config.fixedCodepoints[fileName].toString(16).toUpperCase();
+		} else {
+			currentCodePoint = (currentGlyph++).toString(16).toUpperCase();
+		}
+
+		// Add glyph
+		glyphMap.push({
+			fileName: fileName,
+			codePoint: currentCodePoint
+		});
+
+		// Prepend codePoint to input file path for gulp-iconfont
+		inputFilePrefix = &#x27;u&#x27; + currentCodePoint + &#x27;-&#x27;;
+
+		file.path = path.dirname(file.path) + &#x27;/&#x27; + inputFilePrefix + path.basename(file.path);
+
+		this.push(file);
+		cb();
+	};
+
+	stream._flush = function(cb) {
+		var content;
+		if (glyphMap.length) {
+			consolidate[config.engine](config.path, {
+					glyphs: glyphMap,
+					fontName: config.fontName,
+					fontPath: config.fontPath,
+					cssClass: config.cssClass
+				}, function(err, html) {
+					if (err) {
+						throw new gutil.PluginError(PLUGIN_NAME, &#x27;Error in template: &#x27; + err.message);
+					}
+
+					content = Buffer(html);
+
+					if (outputFile.isBuffer()) {
+						outputFile.contents = content;
+					} else {
+						outputFile.contents.write(content);
+						outputFile.contents.end();
+					}
+
+					stream.push(outputFile);
+
+					cb();
+			});
+		} else {
+			cb();
+		}
+	};
+
+	return stream;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-iconfont-css.toString" id="apidoc.element.gulp-iconfont-css.toString">
+        function <span class="apidocSignatureSpan">gulp-iconfont-css.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return text;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+				contents: file.isBuffer() ? new Buffer(0) : new Stream.PassThrough()
+			});
+		}
+
+		fileName = path.basename(file.path, &#x27;.svg&#x27;);
+		
+		if (config.fixedCodepoints &#x26;&#x26; config.fixedCodepoints[fileName]) {
+			currentCodePoint = config.fixedCodepoints[fileName].<span class="apidocCodeKeywordSpan">toString</span>(16).toUpperCase();
+		} else {
+			currentCodePoint = (currentGlyph++).toString(16).toUpperCase();
+		}
+
+		// Add glyph
+		glyphMap.push({
+			fileName: fileName,
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-iconfont-css.toString" id="apidoc.module.gulp-iconfont-css.toString">module gulp-iconfont-css.toString</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-iconfont-css.toString.toString" id="apidoc.element.gulp-iconfont-css.toString.toString">
+        function <span class="apidocSignatureSpan">gulp-iconfont-css.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+				contents: file.isBuffer() ? new Buffer(0) : new Stream.PassThrough()
+			});
+		}
+
+		fileName = path.basename(file.path, &#x27;.svg&#x27;);
+		
+		if (config.fixedCodepoints &#x26;&#x26; config.fixedCodepoints[fileName]) {
+			currentCodePoint = config.fixedCodepoints[fileName].<span class="apidocCodeKeywordSpan">toString</span>(16).toUpperCase();
+		} else {
+			currentCodePoint = (currentGlyph++).toString(16).toUpperCase();
+		}
+
+		// Add glyph
+		glyphMap.push({
+			fileName: fileName,
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
