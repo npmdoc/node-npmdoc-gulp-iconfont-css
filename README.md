@@ -1,4 +1,7 @@
-# api documentation for  [gulp-iconfont-css (v2.1.0)](https://github.com/backflip/gulp-iconfont-css#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-iconfont-css.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-iconfont-css) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-iconfont-css.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-iconfont-css)
+# npmdoc-gulp-iconfont-css
+
+#### basic api documentation for  [gulp-iconfont-css (v2.1.0)](https://github.com/backflip/gulp-iconfont-css#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-iconfont-css.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-iconfont-css) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-iconfont-css.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-iconfont-css)
+
 #### Generate (S)CSS file for icon font created with Gulp
 
 [![NPM](https://nodei.co/npm/gulp-iconfont-css.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/gulp-iconfont-css)
@@ -72,7 +75,8 @@
     "scripts": {
         "test": "mocha"
     },
-    "version": "2.1.0"
+    "version": "2.1.0",
+    "bin": {}
 }
 ```
 
